@@ -1,0 +1,17 @@
+/* src/index.css */
+
+/* 1. Import the Bricolage Grotesque font from Google Fonts */
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&display=swap");
+
+/* 2. Add Tailwind's base, components, and utilities */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 3. Set global base styles for your website */
+@layer base {
+  body {
+    /* Use @apply to set your default background and text color */
+    @apply font-sans bg-brand-dark text-slate-200;
+  }
+}
