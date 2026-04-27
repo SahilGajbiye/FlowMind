@@ -2,8 +2,7 @@
 
 FlowMind is a state-of-the-art SaaS platform designed to automate complex tasks through a high-fidelity visual canvas. Build intelligent workflows using AI-powered nodes, real-time data tracking, and seamless third-party integrations.
 
-![Dashboard Preview](https://github.com/SahilGajbiye/FlowMind/raw/main/preview.png) *(Add your screenshot here)*
-
+![Dashboard Preview](https://github.com/SahilGajbiye/FlowMind/raw/main/preview.png) 
 ## ✨ Key Features
 
 - **🎨 High-Fidelity Canvas:** Drag-and-drop interface to build complex logic flows with glowing nodes and smooth connections.
