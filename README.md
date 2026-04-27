@@ -1,64 +1,73 @@
 # 🚀 FlowMind: AI-Powered Visual Workflow Automation
 
-FlowMind is a state-of-the-art SaaS platform designed to automate complex tasks through a high-fidelity visual canvas. Build intelligent workflows using AI-powered nodes, real-time data tracking, and seamless third-party integrations.
+FlowMind is a high-performance SaaS platform designed for visual workflow automation. It leverages AI to transform natural language into executable logic, connecting disparate services like Google Calendar, Telegram, and Crypto Trackers through a seamless, drag-and-drop visual interface.
 
-![Dashboard Preview](https://github.com/SahilGajbiye/FlowMind/raw/main/preview.png) 
 ## ✨ Key Features
 
-- **🎨 High-Fidelity Canvas:** Drag-and-drop interface to build complex logic flows with glowing nodes and smooth connections.
-- **🤖 AI-Driven Nodes:** Integrated with OpenAI for natural language parsing, summarization, and decision making.
-- **📊 Premium Dashboard:** A sleek, glassmorphic dashboard to manage your workflows, browse templates, and monitor performance.
-- **🔌 Diverse Integrations:**
-  - **Google Calendar:** Smart event scheduling from natural language.
-  - **Telegram Bot:** Real-time alerts and report delivery.
-  - **Crypto Tracker:** Live price monitoring with AI analysis.
-  - **Weather API:** Automated hourly weather updates.
-- **🚀 One-Click Templates:** Ready-to-use workflows for daily tasks, crypto alerts, and more.
+| Feature | Description |
+| :--- | :--- |
+| **🎨 Visual Canvas** | Build complex logic flows with a high-fidelity, interactive drag-and-drop editor. |
+| **🤖 AI Orchestration** | Integrated with OpenAI for intelligent natural language parsing and decision making. |
+| **📊 Smart Dashboard** | A premium, minimal interface for managing workflows and accessing curated templates. |
+| **🔌 Real-time Sync** | Asynchronous task execution with Celery and Redis for enterprise-grade performance. |
+| **🛡️ Secure Storage** | Robust data management and persistence powered by PostgreSQL. |
 
 ## 🛠️ Tech Stack
 
 ### Frontend
-- **React.js & Vite:** For a blazing-fast user experience.
-- **Tailwind CSS:** Modern, responsive, and premium UI styling.
-- **Lucide React:** Sleek and minimal iconography.
+- **Framework:** React.js + Vite (Fast & Modern)
+- **Styling:** Tailwind CSS (Premium Design System)
+- **Icons:** Lucide React (Minimalist Aesthetic)
 
 ### Backend
-- **Flask (Python):** Lightweight and scalable API orchestration.
-- **Celery & Redis:** Distributed task queue for asynchronous workflow execution.
-- **Google Service Accounts:** Secure integration for enterprise-grade automation.
+- **API:** Flask (Python)
+- **Task Queue:** Celery with Redis (Asynchronous execution)
+- **Automation:** Google Service Accounts Integration
+- **Database:** **PostgreSQL** (Scalable and reliable data persistence)
+
+## 📁 Project Structure
+
+```bash
+├── frontend/          # React + Vite application
+├── backend/           # Flask API & Business Logic
+│   ├── app/           
+│   │   ├── controllers/ # Node logic & Task handlers
+│   │   └── models/      # PostgreSQL Database schemas
+└── .gitignore         # Strict security for secrets & credentials
+```
 
 ## 🚀 Getting Started
 
-### 1. Clone the repository
+### 1. Clone & Setup
 ```bash
 git clone https://github.com/SahilGajbiye/FlowMind.git
 cd FlowMind
 ```
 
-### 2. Setup Backend
+### 2. Backend Initialization
 ```bash
 cd backend
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv/bin/activate  # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 flask run
 ```
 
-### 3. Setup Frontend
+### 3. Frontend Initialization
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-### 4. Run Celery Worker (for task execution)
+### 4. Background Workers
+Ensure Redis is running, then start the Celery worker:
 ```bash
-cd backend
 celery -A app.controllers.tasks worker --pool=solo --loglevel=info
 ```
 
-## 🛡️ Security & Privacy
-FlowMind is built with security in mind. Sensitive data like `credentials.json` and `.env` files are never pushed to public repositories, ensuring your API keys and secrets remain private.
+## 🛡️ Security
+FlowMind enforces strict security protocols. Sensitive environment variables (`.env`) and Google Service Account credentials (`credentials.json`) are explicitly ignored by version control to prevent unauthorized access.
 
 ---
 Built with ❤️ by [Sahil Gajbhiye](https://github.com/SahilGajbiye)
