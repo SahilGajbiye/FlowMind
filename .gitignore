@@ -1,22 +1,26 @@
-# Logs
-*.log
-npm-debug.log*
+# Frontend Dependencies
+frontend/node_modules/
+frontend/dist/
 
-# Dependency directories
-node_modules/
-venv/
-.venv/
-__pycache__/
+# Backend Dependencies & Secrets
+backend/__pycache__/
+backend/*.pyc
+backend/credentials.json
+backend/venv/
+backend/.venv/
 
-# Build outputs
-dist/
-build/
+# Environment Files (Secrets)
+**/.env
+.env.*
+!.env.example
 
-# IDE files
+# System Files
+.DS_Store
+Thumbs.db
 .vscode/
 .idea/
-.DS_Store
 
-# Environment variables
-.env
-.env.local
+# FlowMind Specific
+backend/app/controllers/__pycache__/
+frontend/node_modules/.vite/
+**/__pycache__/

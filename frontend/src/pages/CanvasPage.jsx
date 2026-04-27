@@ -1,4 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
+import { Link } from "react-router-dom";
+
 import {
   Mail,
   MessageSquare,
@@ -14,6 +16,18 @@ import {
   ChevronDown,
   List,
   RefreshCw,
+  Clock,
+  Cpu,
+  FileText,
+  Zap,
+  Globe,
+  Database,
+  Calendar,
+  Coins,
+  GitBranch,
+  Rocket,
+  ShieldCheck,
+  Search,
 } from "lucide-react";
 import html2canvas from "html2canvas";
 
@@ -23,13 +37,118 @@ import { useAuth } from "../context/AuthContext";
 const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
 const CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
 
+// --- Real Brand Logos (SVG Strings) ---
+const LOGO_SVGS = {
+  openai: (
+    <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full text-[#10a37f]">
+      <path d="M22.28 9.82a5.98 5.98 0 0 0-.51-4.9 6.04 6.04 0 0 0-4.39-3.1 6.01 6.01 0 0 0-5.19 1.04 6.02 6.02 0 0 0-5.67 0 6.01 6.01 0 0 0-5.19-1.04 6.05 6.05 0 0 0-4.39 3.1 6 6 0 0 0-.51 4.9 6.04 6.04 0 0 0 1.04 5.19 6.02 6.02 0 0 0 0 5.67 6.01 6.01 0 0 0 1.04 5.19 6.05 6.05 0 0 0 4.39 3.1 6.01 6.01 0 0 0 5.19-1.04 6.02 6.02 0 0 0 5.67 0 6.01 6.01 0 0 0 5.19 1.04 6.05 6.05 0 0 0 4.39-3.1 6 6 0 0 0 .51-4.9 6.04 6.04 0 0 0-1.04-5.19 6.02 6.02 0 0 0 0-5.67 6.01 6.01 0 0 0-1.04-5.19zM12.06 18.97l-5.13-2.96v-5.92l5.13 2.96v5.92zm1.15-2l5.13-2.96v-5.92l-5.13 2.96v5.92zm-6.28-9.07l5.13-2.96 5.13 2.96-5.13 2.96-5.13-2.96z"/>
+    </svg>
+  ),
+  meta: (
+    <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full text-[#0668E1]">
+      <path d="M17.435 8.347c-1.642 0-3.13 1.05-4.322 2.684a20.08 20.08 0 0 1-1.113-1.684C10.808 7.712 9.32 6.66 7.678 6.66c-3.149 0-5.701 2.4-5.701 5.34s2.552 5.34 5.701 5.34c1.642 0 3.13-1.05 4.322-2.684a20.08 20.08 0 0 1 1.113 1.684c1.192 1.635 2.68 2.684 4.322 2.684 3.149 0 5.701-2.4 5.701-5.34s-2.552-5.34-5.701-5.34zm0 8.68c-1.113 0-2.226-.818-3.23-2.18l-.54-.736.54-.736c1.004-1.362 2.117-2.18 3.23-2.18 1.908 0 3.461 1.553 3.461 3.461s-1.553 3.461-3.461 3.461zM7.678 14.847c-1.908 0-3.461-1.553-3.461-3.461s1.553-3.461 3.461-3.461c1.113 0 2.226.818 3.23 2.18l.54.736-.54.736c-1.004 1.362-2.117 2.18-3.23 2.18z" />
+    </svg>
+  ),
+  kimi: (
+    <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full text-purple-400">
+      <path d="M12 2L9.19 8.63 2 12l7.19 3.37L12 22l2.81-6.63L22 12l-7.19-3.37L12 2z" />
+    </svg>
+  ),
+
+  google: (
+
+    <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
+      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+    </svg>
+  ),
+  telegram: (
+    <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
+      <path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm5.891 8.145l-1.456 6.82c-.109.49-.399.611-.81.383l-2.232-1.645-1.077 1.037c-.119.119-.219.219-.449.219l.16-2.268 4.128-3.729c.179-.159-.039-.248-.278-.088l-5.101 3.212-2.198-.687c-.478-.15-.487-.478.1-.706l8.587-3.311c.397-.145.744.093.586.764z" />
+    </svg>
+  ),
+  calendar: (
+    <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
+      <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2zm-7 5h5v5h-5z" fill="#4285F4"/>
+    </svg>
+  ),
+  gmail: (
+    <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
+      <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" fill="#EA4335"/>
+    </svg>
+  ),
+  slack: (
+    <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
+      <path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zM6.313 15.165a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313zM8.834 5.042a2.528 2.528 0 0 1-2.523-2.52A2.528 2.528 0 0 1 8.834 0a2.527 2.527 0 0 1 2.52 2.522v2.52h-2.52zM8.834 6.313a2.527 2.527 0 0 1-2.52 2.521 2.527 2.527 0 0 1 2.52 2.521h6.313A2.528 2.528 0 0 1 17.68 8.834a2.528 2.528 0 0 1-2.522-2.521h-6.324zM18.958 8.834a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.527 2.527 0 0 1-2.522 2.52h-2.52v-2.52zM17.688 8.834a2.527 2.527 0 0 1-2.521 2.52 2.527 2.527 0 0 1-2.521-2.52V2.521A2.528 2.528 0 0 1 15.167 0a2.528 2.528 0 0 1 2.521 2.522v6.312zM15.167 18.958a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.167 24a2.527 2.527 0 0 1-2.52-2.52v-2.52h2.52zM15.167 17.688a2.527 2.527 0 0 1 2.52-2.521 2.527 2.527 0 0 1-2.52-2.521H8.834a2.528 2.528 0 0 1-2.521 2.521 2.528 2.528 0 0 1 2.521 2.521h6.333z" fill="#E01E5A"/>
+    </svg>
+  ),
+  crypto: (
+    <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
+      <path d="M12 24C5.373 24 0 18.627 0 12S5.373 0 12 0s12 5.373 12 12-5.373 12-12 12zm0-22c-5.523 0-10 4.477-10 10s4.477 10 10 10 10-4.477 10-10-4.477-10-10-10zm2 12.5v-1h1.5v-1.5H14v-1h1.5v-1.5H14v-1h-1v1h-1.5v-1h-1v1H9v1.5h1.5v1H9v1.5h1.5v1H9v1h1v-1h1.5v1h1v-1zm-2.5-3.5h1.5v1H11.5v-1zm0 2.5h1.5v1h-1.5v-1z" fill="#F7931A"/>
+    </svg>
+  ),
+  llama: (
+    <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
+      <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8zM11 7h2v10h-2V7z"/>
+    </svg>
+  ),
+  gemini: (
+    <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full text-blue-400">
+      <path d="M12 2L9.19 8.63 2 12l7.19 3.37L12 22l2.81-6.63L22 12l-7.19-3.37L12 2z"/>
+    </svg>
+  ),
+};
+
+// --- Helper for rendering Icons from string ---
+const NodeIcon = ({ iconName, size = 18, className = "" }) => {
+  const icons = {
+    file: FileText,
+    message: MessageSquare,
+    clock: Clock,
+    bot: Cpu,
+    sparkles: Zap,
+    dna: Database,
+    tree: ShieldCheck,
+    mail: Mail,
+    globe: Globe,
+    calendar: Calendar,
+    coins: Coins,
+    branch: GitBranch,
+    rocket: Rocket,
+    search: Search,
+    zap: Zap
+  };
+
+  // Check for brand logos first
+  const brandLogos = {
+    openai: LOGO_SVGS.openai,
+    google: LOGO_SVGS.google,
+    telegram: LOGO_SVGS.telegram,
+    calendar: LOGO_SVGS.calendar,
+    gmail: LOGO_SVGS.gmail,
+    slack: LOGO_SVGS.slack,
+    coins: LOGO_SVGS.crypto,
+    sparkles: LOGO_SVGS.kimi,
+    meta: LOGO_SVGS.meta,
+  };
+
+  if (brandLogos[iconName]) {
+    return <div style={{ width: size, height: size }} className={className}>{brandLogos[iconName]}</div>;
+  }
+
+  const IconComponent = icons[iconName] || Zap;
+  return <IconComponent size={size} className={className} />;
+};
+
 const nodeCategories = {
   Trigger: [
     {
       id: "file-upload",
       type: "DocumentInputNode",
       label: "File Upload",
-      icon: "📁",
+      icon: "file",
       color: "#95E1D3",
       description: "Upload file trigger",
     },
@@ -37,7 +156,7 @@ const nodeCategories = {
       id: "text-message",
       type: "TextInputNode",
       label: "Text input",
-      icon: "💬",
+      icon: "message",
       color: "#95E1D3",
       description: "Input custom text",
     },
@@ -45,7 +164,7 @@ const nodeCategories = {
       id: "schedule",
       type: "ScheduleTriggerNode",
       label: "Schedule",
-      icon: "⏰",
+      icon: "clock",
       color: "#8B5CF6",
       description: "Run on a schedule (cron)",
     },
@@ -55,7 +174,7 @@ const nodeCategories = {
       id: "openai",
       type: "LLMNode",
       label: "OpenAI",
-      icon: "🤖",
+      icon: "openai",
       color: "#10a37f",
       description: "GPT-4, GPT-3.5 models",
     },
@@ -63,7 +182,7 @@ const nodeCategories = {
       id: "llama",
       type: "LLMNode",
       label: "llama",
-      icon: "🦙",
+      icon: "meta",
       color: "#10a37f",
       description: "llama models",
     },
@@ -71,26 +190,17 @@ const nodeCategories = {
       id: "gemini",
       type: "LLMNode",
       label: "Kimi k2",
-      icon: "✨",
+      icon: "sparkles",
       color: "#4285f4",
-      description: "Gemini Pro models",
+      description: "Moonshot AI (Kimi) models",
     },
   ],
-  // "Document Processing": [
-  //   {
-  //     id: "pdf-parser",
-  //     label: "PDF Parser",
-  //     icon: "📄",
-  //     color: "#E74C3C",
-  //     description: "Extract text from PDF",
-  //   },
-  // ],
   "Vector & RAG": [
     {
       id: "faiss",
       type: "VectorDBNode",
       label: "FAISS",
-      icon: "🧬",
+      icon: "dna",
       color: "#1ABC9C",
       description: "Vector database",
     },
@@ -98,7 +208,7 @@ const nodeCategories = {
       id: "pinecone",
       type: "VectorDBNode",
       label: "Pinecone",
-      icon: "🌲",
+      icon: "tree",
       color: "#00D4AA",
       description: "Vector database",
     },
@@ -108,14 +218,14 @@ const nodeCategories = {
       id: "gmail",
       label: "Gmail",
       type: "EmailNode",
-      icon: "📧",
+      icon: "gmail",
       color: "#EA4335",
       description: "EmailNode",
     },
     {
       id: "slack",
       label: "Slack",
-      icon: "💬",
+      icon: "slack",
       color: "#4A154B",
       description: "Send messages",
     },
@@ -123,7 +233,7 @@ const nodeCategories = {
       id: "telegram",
       type: "TelegramNode",
       label: "Telegram",
-      icon: "🌍",
+      icon: "telegram",
       color: "#F97316",
       description: "Send message via Telegram",
     },
@@ -131,9 +241,25 @@ const nodeCategories = {
       id: "http-request",
       type: "HTTPRequestNode",
       label: "HTTP Request",
-      icon: "🌐",
+      icon: "globe",
       color: "#6366F1",
       description: "Call any external API",
+    },
+    {
+      id: "google-calendar",
+      type: "GoogleCalendarNode",
+      label: "Google Calendar",
+      icon: "calendar",
+      color: "#4285F4",
+      description: "Sync events to Google Calendar",
+    },
+    {
+      id: "crypto-tracker",
+      type: "CryptoTrackerNode",
+      label: "Crypto Tracker",
+      icon: "coins",
+      color: "#F7931A",
+      description: "Live crypto/stock prices",
     },
   ],
   "Logic & Flow": [
@@ -141,15 +267,22 @@ const nodeCategories = {
       id: "condition",
       type: "ConditionNode",
       label: "Condition",
-      icon: "🔀",
+      icon: "branch",
       color: "#F59E0B",
       description: "If/Else branching logic",
+    },
+    {
+      id: "scheduler",
+      type: "SchedulerNode",
+      label: "Task Scheduler",
+      icon: "clock",
+      color: "#F59E0B",
+      description: "AI-driven scheduling",
     },
   ],
 };
 
-
-export default function TestPage() {
+export default function CanvasPage() {
   const [nodes, setNodes] = useState([]);
   const [connections, setConnections] = useState([]);
   const [selectedNode, setSelectedNode] = useState(null);
@@ -176,34 +309,10 @@ export default function TestPage() {
     setTimeout(() => setNotification(null), 3000);
   };
 
-  // Add this function to test workflow loading
-  // const testWorkflowLoading = async () => {
-  //   try {
-  //     // First, fetch all workflows to see what's available
-  //     const response = await fetch(`${API_BASE}/workflows`);
-  //     const workflows = await response.json();
-
-  //     console.log("📋 Available workflows:", workflows);
-
-  //     if (workflows.length === 0) {
-  //       notify("No workflows found in database. Create one first.", "error");
-  //       return;
-  //     }
-
-  //     // Load the first workflow for testing
-  //     const firstWorkflow = workflows[0];
-  //     await loadWorkflow(firstWorkflow.id);
-  //   } catch (error) {
-  //     console.error("Test failed:", error);
-  //     notify("Test failed: " + error.message, "error");
-  //   }
-  // };
-
   useEffect(() => {
     const url = window.location.href;
     const lastPart = url.split("/").pop().split("?")[0];
 
-    // Check for template query param
     const searchParams = new URLSearchParams(window.location.search);
     const templateParam = searchParams.get("template");
     if (templateParam) {
@@ -223,29 +332,6 @@ export default function TestPage() {
     loadWorkflow(lastPart);
   }, []);
 
-  // const fetchWorkflows = async () => {
-  //   try {
-  //     const url = window.location.href;
-  //     const lastPart = url.split("/").pop();
-  //     console.log(lastPart);
-
-  //     const response = await fetch(`${API_BASE}/workflows/${lastPart}`, {
-  //       method: "GET",
-  //       headers: {
-  //         Authorization: `Bearer ${tokens.access}`,
-  //       },
-  //     });
-
-  //     if (response.status == 404) return;
-  //     const data = await response.json();
-  //     setSavedWorkflows(data);
-  //     console.log("✅ Loaded workflows from backend:", data);
-  //   } catch (error) {
-  //     console.error("Error fetching workflows:", error);
-  //     notify("Failed to fetch workflows", "error");
-  //   }
-  // };
-
   const loadWorkflow = async (workflowId) => {
     try {
       const response = await fetch(`${API_BASE}/workflows/${workflowId}`, {
@@ -260,14 +346,10 @@ export default function TestPage() {
       if (!response.ok) throw new Error("Workflow not found");
       const workflow = await response.json();
 
-      console.log("📥 Loading workflow:", workflow);
-
-      // Transform the workflow data to match your frontend format
       const transformedNodes = workflow.nodes.map((node) => ({
         ...node,
-        // Ensure all required fields are present
         color: node.color || "#ADFF2F",
-        icon: node.icon || "⚡",
+        icon: node.icon || "bot",
         description: node.description || `${node.type} node`,
         config: node.config || {},
         status: null,
@@ -286,154 +368,113 @@ export default function TestPage() {
     }
   };
 
-  // Generate thumbnail by drawing workflow nodes on an offscreen canvas
   const generateAndUploadThumbnail = async () => {
     try {
-      console.log("📸 Generating thumbnail from node data...");
-      console.log("Cloud name:", CLOUDINARY_CLOUD_NAME);
-      console.log("Upload preset:", CLOUDINARY_UPLOAD_PRESET);
-
-      if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) {
-        console.warn("❌ Cloudinary env vars missing!");
-        return null;
-      }
-
+      if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) return null;
       if (nodes.length === 0) return null;
 
-      // Create offscreen canvas
       const offscreen = document.createElement("canvas");
       offscreen.width = 800;
       offscreen.height = 500;
       const ctx = offscreen.getContext("2d");
 
-      // Background
       ctx.fillStyle = "#141414";
       ctx.fillRect(0, 0, 800, 500);
+      
+      // Draw Grid Pattern
+      ctx.strokeStyle = "#2a2a2a";
+      ctx.lineWidth = 1;
+      for(let i=0; i<800; i+=30) { ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,500); ctx.stroke(); }
+      for(let i=0; i<500; i+=30) { ctx.beginPath(); ctx.moveTo(0,i); ctx.lineTo(800,i); ctx.stroke(); }
 
-      // Draw dot grid
-      ctx.fillStyle = "#2a2a2a";
-      for (let x = 20; x < 800; x += 20) {
-        for (let y = 20; y < 500; y += 20) {
-          ctx.beginPath();
-          ctx.arc(x, y, 1, 0, Math.PI * 2);
-          ctx.fill();
-        }
-      }
-
-      // Find bounding box of nodes
       const xs = nodes.map((n) => n.x);
       const ys = nodes.map((n) => n.y);
-      const minX = Math.min(...xs);
-      const minY = Math.min(...ys);
-      const maxX = Math.max(...xs) + 200;
-      const maxY = Math.max(...ys) + 80;
+      const minX = Math.min(...xs) - 50;
+      const minY = Math.min(...ys) - 50;
+      const maxX = Math.max(...xs) + 250;
+      const maxY = Math.max(...ys) + 100;
+      
       const scaleX = 700 / Math.max(maxX - minX, 1);
-      const scaleY = 420 / Math.max(maxY - minY, 1);
-      const scale = Math.min(scaleX, scaleY, 1);
-      const offsetX = 50 + (700 - (maxX - minX) * scale) / 2;
-      const offsetY = 40 + (420 - (maxY - minY) * scale) / 2;
+      const scaleY = 400 / Math.max(maxY - minY, 1);
+      const scale = Math.min(scaleX, scaleY, 0.8);
+      const offsetX = (800 - (maxX - minX) * scale) / 2;
+      const offsetY = (500 - (maxY - minY) * scale) / 2;
 
-      // Draw connections
-      ctx.strokeStyle = "#ADFF2F";
-      ctx.lineWidth = 2;
-      ctx.setLineDash([6, 4]);
-      ctx.globalAlpha = 0.5;
-      connections.forEach((conn) => {
-        const from = nodes.find((n) => n.id === conn.from);
-        const to = nodes.find((n) => n.id === conn.to);
-        if (!from || !to) return;
-        const fx = offsetX + (from.x - minX) * scale + 110 * scale;
-        const fy = offsetY + (from.y - minY) * scale + 40 * scale;
-        const tx = offsetX + (to.x - minX) * scale;
-        const ty = offsetY + (to.y - minY) * scale + 40 * scale;
-        ctx.beginPath();
-        ctx.moveTo(fx, fy);
-        ctx.lineTo(tx, ty);
-        ctx.stroke();
+      // Draw Connections
+      connections.forEach(conn => {
+        const from = nodes.find(n => n.id === conn.from);
+        const to = nodes.find(n => n.id === conn.to);
+        if(from && to) {
+          ctx.beginPath();
+          ctx.strokeStyle = from.color;
+          ctx.lineWidth = 3 * scale;
+          ctx.setLineDash([5, 5]);
+          const x1 = offsetX + (from.x - minX + 160) * scale;
+          const y1 = offsetY + (from.y - minY + 40) * scale;
+          const x2 = offsetX + (to.x - minX) * scale;
+          const y2 = offsetY + (to.y - minY + 40) * scale;
+          ctx.moveTo(x1, y1);
+          ctx.lineTo(x2, y2);
+          ctx.stroke();
+          ctx.setLineDash([]);
+        }
       });
-      ctx.setLineDash([]);
-      ctx.globalAlpha = 1;
 
-      // Draw nodes
+      // Draw Nodes
       nodes.forEach((node) => {
         const nx = offsetX + (node.x - minX) * scale;
         const ny = offsetY + (node.y - minY) * scale;
-        const nw = Math.max(180 * scale, 100);
-        const nh = Math.max(70 * scale, 40);
-        const r = 10;
-
-        // Node shadow
-        ctx.shadowColor = node.color || "#ADFF2F";
-        ctx.shadowBlur = 12;
-
+        const nw = 180 * scale;
+        const nh = 70 * scale;
+        
+        // Glow effect
+        ctx.shadowBlur = 15 * scale;
+        ctx.shadowColor = node.color;
+        
         // Node background
         ctx.fillStyle = "#1C1C1E";
+        ctx.strokeStyle = node.color;
+        ctx.lineWidth = 2 * scale;
+        
+        const r = 10 * scale;
         ctx.beginPath();
-        ctx.roundRect(nx, ny, nw, nh, r);
+        ctx.moveTo(nx + r, ny);
+        ctx.lineTo(nx + nw - r, ny);
+        ctx.quadraticCurveTo(nx + nw, ny, nx + nw, ny + r);
+        ctx.lineTo(nx + nw, ny + nh - r);
+        ctx.quadraticCurveTo(nx + nw, ny + nh, nx + nw - r, ny + nh);
+        ctx.lineTo(nx + r, ny + nh);
+        ctx.quadraticCurveTo(nx, ny + nh, nx, ny + nh - r);
+        ctx.lineTo(nx, ny + r);
+        ctx.quadraticCurveTo(nx, ny, nx + r, ny);
+        ctx.closePath();
         ctx.fill();
-        ctx.shadowBlur = 0;
-
-        // Node color accent bar (left side)
-        ctx.fillStyle = node.color || "#ADFF2F";
-        ctx.beginPath();
-        ctx.roundRect(nx, ny, 4, nh, [r, 0, 0, r]);
-        ctx.fill();
-
-        // Border
-        ctx.strokeStyle = node.color || "#ADFF2F";
-        ctx.lineWidth = 1;
-        ctx.globalAlpha = 0.4;
-        ctx.beginPath();
-        ctx.roundRect(nx, ny, nw, nh, r);
         ctx.stroke();
-        ctx.globalAlpha = 1;
+        
+        ctx.shadowBlur = 0;
+        
+        // Node Header Color Bar
+        ctx.fillStyle = node.color;
+        ctx.fillRect(nx, ny, 6 * scale, nh);
 
-        // Icon + label
-        const fontSize = Math.max(12 * scale, 9);
-        ctx.fillStyle = "#ffffff";
-        ctx.font = `bold ${fontSize}px sans-serif`;
-        ctx.fillText(
-          `${node.icon || "⚡"} ${node.label || node.type}`,
-          nx + 12,
-          ny + nh / 2 + fontSize / 3
-        );
+        // Node Label Text
+        ctx.fillStyle = "#FFFFFF";
+        ctx.font = `bold ${14 * scale}px Inter, sans-serif`;
+        ctx.fillText(node.label, nx + 15 * scale, ny + 25 * scale);
+        
+        // Optional: Draw a tiny icon placeholder
+        ctx.globalAlpha = 0.3;
+        ctx.fillStyle = node.color;
+        ctx.beginPath();
+        ctx.arc(nx + nw - 20 * scale, ny + 20 * scale, 10 * scale, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1.0;
       });
 
-      // Convert to blob and upload
-      return new Promise((resolve) => {
-        offscreen.toBlob(async (blob) => {
-          if (!blob) { resolve(null); return; }
-          console.log("✅ Canvas blob created:", blob.size, "bytes");
+      return offscreen.toDataURL("image/png", 0.9);
 
-          const formData = new FormData();
-          formData.append("file", blob, "thumbnail.png");
-          formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
-          formData.append("folder", "flowmind-thumbnails");
 
-          try {
-            console.log("⬆️ Uploading to Cloudinary...");
-            const res = await fetch(
-              `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
-              { method: "POST", body: formData }
-            );
-            const data = await res.json();
-            console.log("☁️ Cloudinary response:", data);
-            if (data.error) {
-              console.warn("❌ Cloudinary error:", data.error.message);
-              // Fallback: use data URL directly
-              resolve(offscreen.toDataURL("image/png", 0.7));
-            } else {
-              console.log("✅ Uploaded! URL:", data.secure_url);
-              resolve(data.secure_url);
-            }
-          } catch (err) {
-            console.warn("❌ Upload failed, using dataURL fallback:", err);
-            resolve(offscreen.toDataURL("image/png", 0.7));
-          }
-        }, "image/png", 0.85);
-      });
     } catch (err) {
-      console.warn("❌ Thumbnail generation failed:", err);
       return null;
     }
   };
@@ -446,10 +487,7 @@ export default function TestPage() {
     try {
       const link = window.location.href;
       const lastPart = link.split("/").pop().split("?")[0];
-
-      // Generate and upload thumbnail
       const thumbnailUrl = await generateAndUploadThumbnail();
-      console.log("🖼️ Final thumbnail URL:", thumbnailUrl);
 
       const workflowData = {
         id: lastPart,
@@ -458,11 +496,9 @@ export default function TestPage() {
         connections,
         ...(thumbnailUrl && { thumbnail_url: thumbnailUrl }),
       };
-      const url = `${API_BASE}/workflows`;
-      const method = "POST";
 
-      const response = await fetch(url, {
-        method,
+      const response = await fetch(`${API_BASE}/workflows`, {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${tokens.access}`,
@@ -471,13 +507,8 @@ export default function TestPage() {
       });
 
       if (!response.ok) throw new Error("Failed to save");
-      const savedWorkflow = await response.json();
-
-      setCurrentWorkflowId(savedWorkflow.id);
       notify("Workflow saved successfully!");
-      // fetchWorkflows();
     } catch (error) {
-      console.error("Error saving workflow:", error);
       notify("Failed to save workflow", "error");
     }
   };
@@ -488,199 +519,55 @@ export default function TestPage() {
       const link = window.location.href;
       workflowIdToRun = link.split("/").pop().split("?")[0];
     }
-
     if (!workflowIdToRun) {
       notify("Please save the workflow before executing", "error");
       return;
     }
-    
     setIsExecuting(true);
-    setExecutionResults(null);
-
-    // ✅ Feature 7: Mark all nodes as "running" immediately
     setNodes((prev) => prev.map((n) => ({ ...n, status: "running" })));
-
     try {
-      const workflowPayload = {
-        id: workflowIdToRun,
-        name: workflowName,
-        nodes: nodes,
-        connections: connections,
-      };
-      const response = await fetch(
-        `${API_BASE}/workflows/${workflowIdToRun}/execute`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${tokens.access}`,
-          },
-          body: JSON.stringify(workflowPayload),
+      const workflowPayload = { id: workflowIdToRun, name: workflowName, nodes, connections };
+      const response = await fetch(`${API_BASE}/workflows/${workflowIdToRun}/execute`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokens.access}`,
         },
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Execution failed to start");
-      }
-
-      const data = await response.json();
-      setExecutionId(data.executionId);
+        body: JSON.stringify(workflowPayload),
+      });
+      if (!response.ok) throw new Error("Execution failed");
       notify("Workflow execution started...");
-
-      // ✅ Simulate node completion: mark nodes "success" one by one
-      const delay = (ms) => new Promise((res) => setTimeout(res, ms));
-      for (let i = 0; i < nodes.length; i++) {
-        await delay(2000 + i * 1500);
-        const nodeId = nodes[i].id;
-        setNodes((prev) =>
-          prev.map((n) => n.id === nodeId ? { ...n, status: "success" } : n)
-        );
-      }
-      setIsExecuting(false);
-
+      setTimeout(() => {
+        setNodes((prev) => prev.map((n) => ({ ...n, status: "success" })));
+        setIsExecuting(false);
+      }, 3000);
     } catch (error) {
-      console.error("Error executing workflow:", error);
-      notify(error.message || "Failed to execute workflow", "error");
-      // Mark all nodes as error
       setNodes((prev) => prev.map((n) => ({ ...n, status: "error" })));
       setIsExecuting(false);
     }
   };
 
-
-  // const pollExecutionStatus = (execId) => {
-  //   const intervalId = setInterval(async () => {
-  //     try {
-  //       const response = await fetch(`${API_BASE}/workflows/exec/${execId}`, {
-  //         method: "GET",
-  //         headers: {
-  //           Authorization: `Bearer ${tokens.access}`,
-  //         },
-  //       });
-
-  //       if (!response.ok) return;
-  //       const execution = await response.json();
-
-  //       setNodes((prevNodes) =>
-  //         prevNodes.map((node) => {
-  //           const result = execution.nodeResults.find(
-  //             (r) => r.nodeId === node.id,
-  //           );
-  //           return result ? { ...node, status: "success" } : node;
-  //         }),
-  //       );
-
-  //       if (execution.status === "completed" || execution.status === "failed") {
-  //         clearInterval(intervalId);
-  //         setIsExecuting(false);
-  //         setExecutionResults(execution);
-  //         if (execution.status === "completed") {
-  //           notify("Workflow execution completed!");
-  //         } else {
-  //           notify(`Execution failed: ${execution.error}`, "error");
-  //         }
-  //       }
-  //     } catch (error) {
-  //       clearInterval(intervalId);
-  //       setIsExecuting(false);
-  //       console.error("Polling error:", error);
-  //     }
-  //   }, 2000);
-  // };
-
-  const exportWorkflow = () => {
-    const workflowData = { name: workflowName, nodes, connections };
-    const blob = new Blob([JSON.stringify(workflowData, null, 2)], {
-      type: "application/json",
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${workflowName.replace(/\s+/g, "-").toLowerCase()}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    notify("Workflow exported");
-  };
-
-  const clearCanvas = () => {
-    if (
-      window.confirm(
-        "Are you sure you want to create a new workflow? Unsaved changes will be lost.",
-      )
-    ) {
-      setNodes([]);
-      setConnections([]);
-      setSelectedNode(null);
-      setCurrentWorkflowId(null);
-      setWorkflowName("Untitled Workflow");
-      setExecutionResults(null);
-      notify("Canvas cleared");
-    }
-  };
-
   const handleConfigChange = (nodeId, configKey, value) => {
-    const newNodes = nodes.map((node) => {
-      if (node.id === nodeId) {
-        return {
-          ...node,
-          config: {
-            ...node.config,
-            [configKey]: value,
-          },
-        };
-      }
-      return node;
-    });
-    setNodes(newNodes);
-
-    if (selectedNode && selectedNode.id === nodeId) {
-      setSelectedNode((prev) => ({
-        ...prev,
-        config: {
-          ...prev.config,
-          [configKey]: value,
-        },
-      }));
+    setNodes((prev) => prev.map((node) => node.id === nodeId ? { ...node, config: { ...node.config, [configKey]: value } } : node));
+    if (selectedNode?.id === nodeId) {
+      setSelectedNode((prev) => ({ ...prev, config: { ...prev.config, [configKey]: value } }));
     }
   };
 
-  const handleMouseMove = useCallback(
-    (e) => {
-      if (canvasRef.current) {
-        const rect = canvasRef.current.getBoundingClientRect();
-        setMousePos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
-      }
-      if (draggedNode !== null) {
-        const rect = canvasRef.current.getBoundingClientRect();
-        setNodes((prev) =>
-          prev.map((node) =>
-            node.id === draggedNode
-              ? {
-                  ...node,
-                  x: e.clientX - rect.left - dragOffset.x,
-                  y: e.clientY - rect.top - dragOffset.y,
-                }
-              : node,
-          ),
-        );
-      }
-    },
-    [draggedNode, dragOffset],
-  );
+  const handleMouseMove = useCallback((e) => {
+    if (canvasRef.current) {
+      const rect = canvasRef.current.getBoundingClientRect();
+      setMousePos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+    }
+    if (draggedNode !== null) {
+      const rect = canvasRef.current.getBoundingClientRect();
+      setNodes((prev) => prev.map((node) => node.id === draggedNode ? { ...node, x: e.clientX - rect.left - dragOffset.x, y: e.clientY - rect.top - dragOffset.y } : node));
+    }
+  }, [draggedNode, dragOffset]);
 
   const handleMouseUp = useCallback(() => {
-    if (
-      connecting !== null &&
-      hoveredNode !== null &&
-      hoveredNode !== connecting
-    ) {
-      setConnections((prev) => [
-        ...prev,
-        { from: connecting, to: hoveredNode },
-      ]);
+    if (connecting !== null && hoveredNode !== null && hoveredNode !== connecting) {
+      setConnections((prev) => [...prev, { from: connecting, to: hoveredNode }]);
     }
     setConnecting(null);
     setDraggedNode(null);
@@ -715,902 +602,214 @@ export default function TestPage() {
 
   const deleteNode = (nodeId) => {
     setNodes((prev) => prev.filter((n) => n.id !== nodeId));
-    setConnections((prev) =>
-      prev.filter((c) => c.from !== nodeId && c.to !== nodeId),
-    );
+    setConnections((prev) => prev.filter((c) => c.from !== nodeId && c.to !== nodeId));
     if (selectedNode?.id === nodeId) setSelectedNode(null);
   };
 
-  const getNodeCenter = (node) => ({
-    x: node.x + 110,
-    y: node.y + 40,
-  });
+  const getNodeCenter = (node) => ({ x: node.x + 110, y: node.y + 40 });
 
   return (
     <div className="flex flex-col w-full h-screen overflow-hidden font-sans text-white bg-brand-dark">
       {notification && (
-        <div
-          className={`fixed top-20 right-6 z-50 rounded-xl p-4 shadow-xl flex items-center gap-3 min-w-80 ${
-            notification.type === "error"
-              ? "bg-red-500/20 border border-red-500/30"
-              : "bg-primary/20 border border-primary/30"
-          }`}
-        >
-          {notification.type === "error" ? (
-            <AlertCircle size={20} className="text-red-400" />
-          ) : (
-            <CheckCircle2 size={20} className="text-primary" />
-          )}
-          <span
-            className={`text-sm font-medium ${
-              notification.type === "error" ? "text-red-300" : "text-primary"
-            }`}
-          >
-            {notification.message}
-          </span>
+        <div className={`fixed top-20 right-6 z-50 rounded-xl p-4 shadow-xl flex items-center gap-3 min-w-80 ${notification.type === "error" ? "bg-red-500/20 border border-red-500/30" : "bg-primary/20 border border-primary/30"}`}>
+          {notification.type === "error" ? <AlertCircle size={20} className="text-red-400" /> : <CheckCircle2 size={20} className="text-primary" />}
+          <span className={`text-sm font-medium ${notification.type === "error" ? "text-red-300" : "text-primary"}`}>{notification.message}</span>
         </div>
       )}
 
-      {/* Main Canvas Area - Takes 70% of screen */}
-      <div
-        className="relative flex-1 overflow-hidden"
-        style={{ height: "50vh" }}
-      >
-        <div
-          ref={canvasRef}
-          className="relative w-full h-full overflow-auto bg-brand-dark"
-          style={{
-            backgroundImage: "radial-gradient(#38373A 1px, transparent 1px)",
-            backgroundSize: "20px 20px",
-          }}
-        >
+      {/* Top Header */}
+      <div className="flex items-center justify-between px-6 py-3 border-b bg-brand-dark/50 backdrop-blur-md border-stroke z-30">
+        <div className="flex items-center gap-4">
+          <Link to="/workflow" className="p-2 transition-colors rounded-lg hover:bg-white/5 text-slate-400">
+            <X size={20} />
+          </Link>
+          <div className="w-px h-6 bg-stroke" />
+          <input type="text" value={workflowName} onChange={(e) => setWorkflowName(e.target.value)} className="bg-transparent border-none text-md font-bold text-white focus:outline-none focus:ring-0 w-64" />
+        </div>
+        <div className="flex items-center gap-2 text-xs font-medium text-slate-500 bg-white/5 px-3 py-1.5 rounded-full border border-stroke">
+           <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+           Editing Mode
+        </div>
+      </div>
+
+      <div className="relative flex-1 overflow-hidden">
+        {/* Canvas Area */}
+        <div ref={canvasRef} className="relative w-full h-full cursor-grab active:cursor-grabbing bg-brand-dark" style={{ backgroundImage: "radial-gradient(#2a2a2a 1px, transparent 1px)", backgroundSize: "30px 30px" }}>
           {/* Connections SVG */}
-          <svg className="absolute inset-0 z-10 w-full h-full pointer-events-none">
+          <svg className="absolute inset-0 pointer-events-none z-10 w-full h-full">
             {connections.map((conn, idx) => {
-              const fromNode = nodes.find((n) => n.id === conn.from);
-              const toNode = nodes.find((n) => n.id === conn.to);
-              if (!fromNode || !toNode) return null;
-              const from = getNodeCenter(fromNode);
-              const to = getNodeCenter(toNode);
+              const from = nodes.find((n) => n.id === conn.from);
+              const to = nodes.find((n) => n.id === conn.to);
+              if (!from || !to) return null;
+              const start = getNodeCenter(from);
+              const end = { x: to.x, y: to.y + 40 };
+              const cp1x = start.x + Math.abs(end.x - start.x) / 2;
+              const cp2x = end.x - Math.abs(end.x - start.x) / 2;
               return (
                 <g key={idx}>
-                  <line
-                    x1={from.x}
-                    y1={from.y}
-                    x2={to.x}
-                    y2={to.y}
-                    stroke="#ADFF2F"
-                    strokeWidth="3"
-                    strokeDasharray="5,5"
-                    opacity="0.6"
-                  />
-                  <circle cx={to.x} cy={to.y} r="6" fill="#ADFF2F" />
+                  <path d={`M ${start.x} ${start.y} C ${cp1x} ${start.y}, ${cp2x} ${end.y}, ${end.x} ${end.y}`} fill="none" stroke={from.color} strokeWidth="3" strokeLinecap="round" opacity="0.6" className="connection-path" />
+                  <circle cx={end.x} cy={end.y} r="4" fill={from.color} />
                 </g>
               );
             })}
             {connecting !== null && (
-              <line
-                x1={getNodeCenter(nodes.find((n) => n.id === connecting)).x}
-                y1={getNodeCenter(nodes.find((n) => n.id === connecting)).y}
-                x2={mousePos.x}
-                y2={mousePos.y}
-                stroke="#ADFF2F"
-                strokeWidth="3"
-                strokeDasharray="5,5"
-                opacity="0.4"
-              />
+              <line x1={getNodeCenter(nodes.find((n) => n.id === connecting)).x} y1={getNodeCenter(nodes.find((n) => n.id === connecting)).y} x2={mousePos.x} y2={mousePos.y} stroke="#ADFF2F" strokeWidth="3" strokeDasharray="5,5" opacity="0.4" />
             )}
           </svg>
 
           {/* Nodes */}
           {nodes.map((node) => (
-            <div
-              key={node.id}
-              className="absolute z-20"
-              style={{ left: node.x, top: node.y }}
-              onMouseEnter={() => setHoveredNode(node.id)}
-              onMouseLeave={() => setHoveredNode(null)}
-            >
-              {/* Input Connector */}
-              <div
-                className="absolute -left-2 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-[#1C1C1E] rounded-full cursor-crosshair z-30"
-                style={{ backgroundColor: node.color }}
-              />
-
-              {/* Node Body */}
-              <div
-                onMouseDown={(e) => {
-                  setDraggedNode(node.id);
-                  setDragOffset({
-                    x: e.clientX - e.currentTarget.getBoundingClientRect().left,
-                    y: e.clientY - e.currentTarget.getBoundingClientRect().top,
-                  });
-                  setSelectedNode(node);
-                }}
-                onClick={() => setSelectedNode(node)}
-                className="bg-[#1C1C1E] border-2 rounded-xl w-80 p-4 cursor-move transition-all user-select-none"
-                style={{
-                  borderColor:
-                    selectedNode?.id === node.id ? node.color : "#38373A",
-                  boxShadow:
-                    selectedNode?.id === node.id
-                      ? `0 8px 32px ${node.color}40`
-                      : "0 4px 16px rgba(0,0,0,0.3)",
-                }}
-              >
+            <div key={node.id} className="absolute z-20" style={{ left: node.x, top: node.y }} onMouseEnter={() => setHoveredNode(node.id)} onMouseLeave={() => setHoveredNode(null)}>
+              <div className="absolute -left-2 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-[#1C1C1E] rounded-full cursor-crosshair z-30" style={{ backgroundColor: node.color }} />
+              <div onMouseDown={(e) => { setDraggedNode(node.id); setDragOffset({ x: e.clientX - e.currentTarget.getBoundingClientRect().left, y: e.clientY - e.currentTarget.getBoundingClientRect().top }); setSelectedNode(node); }} onClick={() => setSelectedNode(node)} className="bg-[#1C1C1E] border-2 rounded-xl w-80 p-4 cursor-move transition-all user-select-none" style={{ borderColor: selectedNode?.id === node.id ? node.color : "#38373A", boxShadow: selectedNode?.id === node.id ? `0 8px 32px ${node.color}40` : "0 4px 16px rgba(0,0,0,0.3)" }}>
                 <div className="flex items-start gap-3">
-                  <div
-                    className="flex items-center justify-center h-12 text-2xl min-w-12 rounded-xl"
-                    style={{ backgroundColor: `${node.color}15` }}
-                  >
-                    {node.icon}
+                  <div className="flex items-center justify-center h-12 w-12 min-w-12 rounded-xl" style={{ backgroundColor: `${node.color}15`, color: node.color }}>
+                    <NodeIcon iconName={node.icon} size={28} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="mb-1 text-sm font-semibold text-white">
-                      {node.label}
-                    </div>
-                    <div className="text-xs leading-relaxed text-gray-400">
-                      {node.description}
-                    </div>
+                    <div className="mb-1 text-sm font-semibold text-white">{node.label}</div>
+                    <div className="text-xs leading-relaxed text-gray-400">{node.description}</div>
                     {node.status && (
                       <div className="flex items-center gap-2 mt-2">
-                        {node.status === "success" && (
-                          <CheckCircle2 size={14} className="text-primary" />
-                        )}
-                        {node.status === "running" && (
-                          <div className="w-3.5 h-3.5 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin" />
-                        )}
-                        {node.status === "error" && (
-                          <AlertCircle size={14} className="text-red-400" />
-                        )}
-                        <span
-                          className={`text-xs font-medium ${
-                            node.status === "success" ? "text-primary"
-                            : node.status === "error" ? "text-red-400"
-                            : "text-yellow-400"
-                          }`}
-                        >
-                          {node.status === "success" ? "✓ Completed"
-                           : node.status === "error" ? "✗ Failed"
-                           : "⟳ Running..."}
-                        </span>
+                        {node.status === "success" && <CheckCircle2 size={14} className="text-primary" />}
+                        {node.status === "running" && <div className="w-3.5 h-3.5 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin" />}
+                        {node.status === "error" && <AlertCircle size={14} className="text-red-400" />}
+                        <span className={`text-xs font-medium ${node.status === "success" ? "text-primary" : node.status === "error" ? "text-red-400" : "text-yellow-400"}`}>{node.status === "success" ? "✓ Completed" : node.status === "error" ? "✗ Failed" : "⟳ Running..."}</span>
                       </div>
                     )}
                   </div>
                 </div>
               </div>
-
-              {/* Output Connector */}
-              <div
-                onMouseDown={(e) => {
-                  e.stopPropagation();
-                  setConnecting(node.id);
-                }}
-                className="absolute -right-2 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-[#1C1C1E] rounded-full cursor-crosshair z-30"
-                style={{ backgroundColor: node.color }}
-              />
+              <div onMouseDown={(e) => { e.stopPropagation(); setConnecting(node.id); }} className="absolute -right-2 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-[#1C1C1E] rounded-full cursor-crosshair z-30" style={{ backgroundColor: node.color }} />
             </div>
           ))}
 
           {/* Empty State */}
           {nodes.length === 0 && !showNodePanel && (
-            <div className="absolute inset-0 z-10 flex items-center justify-center text-center">
-              <div className="mb-4 text-5xl">🚀</div>
-              <div className="mb-2 text-2xl font-semibold text-white">
-                Start Building Your Workflow
+            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center text-center px-4">
+              <div className="mb-6 text-primary drop-shadow-2xl">
+                 <Rocket size={80} strokeWidth={1.5} className="animate-bounce" />
               </div>
-              <div className="text-lg text-gray-400">
-                Click the + button in the toolbar to add your first node
-              </div>
+              <h2 className="mb-3 text-3xl font-bold text-white tracking-tight">Start Building Your Workflow</h2>
+              <p className="max-w-md text-lg text-gray-400 leading-relaxed">Click the <span className="text-primary font-bold">+</span> button in the toolbar below <br/> to add your first node and begin automations.</p>
             </div>
           )}
+        </div>
+
+        {/* Bottom Toolbar */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-40 flex items-center gap-3 px-6 py-4 rounded-3xl bg-[#1C1C1E]/80 backdrop-blur-xl border border-stroke shadow-2xl">
+          <button onClick={() => setShowNodePanel(true)} className="flex items-center gap-2 px-6 py-3 text-sm font-bold transition-all rounded-2xl bg-primary text-brand-dark hover:scale-105 active:scale-95 shadow-lg shadow-primary/20">
+            <Plus size={18} strokeWidth={2.5} /> Add Node
+          </button>
+          <div className="w-px h-8 mx-2 bg-stroke" />
+          <button onClick={saveWorkflow} className="flex items-center gap-2 px-5 py-3 text-sm font-semibold transition-colors rounded-2xl bg-white/5 hover:bg-white/10 border border-stroke">
+            <Save size={18} /> Save
+          </button>
+          <button onClick={executeWorkflow} disabled={isExecuting} className="flex items-center gap-2 px-8 py-3 text-sm font-bold transition-all rounded-2xl bg-accent text-white hover:scale-105 active:scale-95 shadow-lg shadow-accent/20 disabled:opacity-50 disabled:scale-100">
+            <Play size={18} fill="currentColor" /> {isExecuting ? "Running..." : "Run Workflow"}
+          </button>
         </div>
 
         {/* Node Settings Panel */}
         {selectedNode && (
           <div className="absolute right-0 top-0 h-full w-80 bg-[#1C1C1E] border-l border-stroke flex flex-col shadow-lg z-30">
-            {/* Panel Header */}
             <div className="flex items-center justify-between p-5 border-b border-stroke">
-              <div>
-                <div className="text-lg font-bold text-white">
-                  Node Settings
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg" style={{ backgroundColor: `${selectedNode.color}15`, color: selectedNode.color }}>
+                   <NodeIcon iconName={selectedNode.icon} size={20} />
                 </div>
-                <div className="text-sm text-gray-400 mt-0.5">
-                  Configure node parameters
-                </div>
+                <div className="text-lg font-bold text-white">{selectedNode.label}</div>
               </div>
-              <button
-                onClick={() => setSelectedNode(null)}
-                className="bg-[#2A2A2D] border border-stroke rounded-lg p-2 cursor-pointer hover:border-primary/50 transition-colors"
-              >
-                <X size={18} className="text-gray-400" />
-              </button>
+              <button onClick={() => setSelectedNode(null)} className="p-2 text-gray-500 transition-colors hover:text-white rounded-lg hover:bg-white/5"><X size={20} /></button>
             </div>
-
-            {/* Panel Content */}
-            <div className="flex-1 p-5 overflow-y-auto">
-              {/* Node Info */}
-              <div
-                className="p-4 mb-6 border rounded-xl"
-                style={{
-                  backgroundColor: `${selectedNode.color}08`,
-                  borderColor: `${selectedNode.color}20`,
-                }}
-              >
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="text-3xl">{selectedNode.icon}</div>
-                  <div>
-                    <div className="text-base font-semibold text-white">
-                      {selectedNode.label}
-                    </div>
-                    <div className="mt-1 text-xs text-gray-400 break-all">
-                      ID: {selectedNode.id}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Dynamic Configuration Forms */}
-              {selectedNode.type === "webhook" && (
-                <div className="mb-4">
-                  <label className="block mb-2 text-sm font-semibold text-gray-300">
-                    Webhook Trigger URL
-                  </label>
-                  <div className="p-3 bg-[#2A2A2D] border border-stroke rounded-lg text-sm text-gray-300 break-all mb-3 font-mono">
-                    {currentWorkflowId 
-                      ? `${API_BASE}/workflows/${currentWorkflowId}/webhook` 
-                      : "Save workflow first to generate URL"}
-                  </div>
-                  <p className="text-xs text-gray-500">
-                    Send a POST request to this URL with a JSON payload to instantly trigger this workflow.
-                  </p>
-                </div>
-              )}
-
-              {selectedNode.type === "gmail" && (
-                <>
-                  <div className="mb-4">
-                    <label className="block mb-2 text-sm font-semibold text-gray-300">
-                      From Email
-                    </label>
-                    <input
-                      type="email"
-                      placeholder="your-email@gmail.com"
-                      value={selectedNode.config.sender_gmail || ""}
-                      onChange={(e) =>
-                        handleConfigChange(
-                          selectedNode.id,
-                          "sender_gmail",
-                          e.target.value,
-                        )
-                      }
-                      className="w-full px-3 py-2.5 bg-[#2A2A2D] border border-stroke rounded-lg text-white text-sm outline-none placeholder-gray-500 focus:border-primary/50 transition-colors"
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <label className="block mb-2 text-sm font-semibold text-gray-300">
-                      Gmail App Password
-                    </label>
-                    <input
-                      type="password"
-                      placeholder="Get it from your Gmail account settings"
-                      value={selectedNode.config.mail_password || ""}
-                      onChange={(e) =>
-                        handleConfigChange(
-                          selectedNode.id,
-                          "mail_password",
-                          e.target.value,
-                        )
-                      }
-                      className="w-full px-3 py-2.5 bg-[#2A2A2D] border border-stroke rounded-lg text-white text-sm outline-none placeholder-gray-500 focus:border-primary/50 transition-colors"
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <label className="block mb-2 text-sm font-semibold text-gray-300">
-                      To Email
-                    </label>
-                    <input
-                      type="email"
-                      placeholder="recipient@example.com"
-                      value={selectedNode.config.rec_email_id || ""}
-                      onChange={(e) =>
-                        handleConfigChange(
-                          selectedNode.id,
-                          "rec_email_id",
-                          e.target.value,
-                        )
-                      }
-                      className="w-full px-3 py-2.5 bg-[#2A2A2D] border border-stroke rounded-lg text-white text-sm outline-none placeholder-gray-500 focus:border-primary/50 transition-colors"
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <label className="block mb-2 text-sm font-semibold text-gray-300">
-                      Subject
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="Your email subject"
-                      value={selectedNode.config.subject || ""}
-                      onChange={(e) =>
-                        handleConfigChange(
-                          selectedNode.id,
-                          "subject",
-                          e.target.value,
-                        )
-                      }
-                      className="w-full px-3 py-2.5 bg-[#2A2A2D] border border-stroke rounded-lg text-white text-sm outline-none placeholder-gray-500 focus:border-primary/50 transition-colors"
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <label className="block mb-2 text-sm font-semibold text-gray-300">
-                      Body
-                    </label>
-                    <textarea
-                      placeholder="Email content..."
-                      value={selectedNode.config.body || ""}
-                      onChange={(e) =>
-                        handleConfigChange(
-                          selectedNode.id,
-                          "body",
-                          e.target.value,
-                        )
-                      }
-                      rows={5}
-                      className="w-full px-3 py-2.5 bg-[#2A2A2D] border border-stroke rounded-lg text-white text-sm outline-none placeholder-gray-500 focus:border-primary/50 transition-colors resize-vertical font-sans"
-                    />
-                  </div>
-                </>
-              )}
-
-              {(selectedNode.type === "openai" ||
-                selectedNode.type === "anthropic" ||
-                selectedNode.type === "gemini" ||
-                selectedNode.type === "llama") && (
-                <>
-                  {/*
-                    Model selector temporarily commented out per request.
-                    This keeps the Prompt textarea and functionality intact.
-
-                    To re-enable the model dropdown later, uncomment the
-                    following block and adjust available options as needed.
-                  */}
-                  {false && (
-                    <div className="mb-4">
-                      <label className="block mb-2 text-sm font-semibold text-gray-300">
-                        Model
-                      </label>
-                      <select
-                        value={selectedNode.config.type || ""}
-                        onChange={(e) =>
-                          handleConfigChange(
-                            selectedNode.id,
-                            "model",
-                            e.target.value,
-                          )
-                        }
-                        className="w-full px-3 py-2.5 bg-[#2A2A2D] border border-stroke rounded-lg text-white text-sm outline-none focus:border-primary/50 transition-colors"
-                      >
-                        {selectedNode.type === "openai" && (
-                          <>
-                            <option>gpt-4</option>
-                            <option>gpt-4-turbo</option>
-                            <option>gpt-3.5-turbo</option>
-                          </>
-                        )}
-                        {selectedNode.type === "anthropic" && (
-                          <>
-                            <option>claude-3-opus</option>
-                            <option>claude-3-sonnet</option>
-                          </>
-                        )}
-                        {selectedNode.type === "gemini" && (
-                          <>
-                            <option>gemini-pro</option>
-                            <option>gemini-pro-vision</option>
-                          </>
-                        )}
-                      </select>
-                    </div>
-                  )}
-
-                  <div className="mb-4">
-                    <label className="block mb-2 text-sm font-semibold text-gray-300">
-                      Prompt
-                    </label>
-                    <textarea
-                      placeholder="Enter your prompt here..."
-                      value={selectedNode.config.prompt || ""}
-                      onChange={(e) =>
-                        handleConfigChange(
-                          selectedNode.id,
-                          "prompt",
-                          e.target.value,
-                        )
-                      }
-                      rows={8}
-                      className="w-full px-3 py-2.5 bg-[#2A2A2D] border border-stroke rounded-lg text-white text-sm outline-none placeholder-gray-500 focus:border-primary/50 transition-colors resize-vertical font-mono"
-                    />
-                  </div>
-                </>
-              )}
-
-              {(selectedNode.type === "faiss" ||
-                selectedNode.type === "pinecone") && (
-                <div className="mb-4">
-                  <label className="block mb-2 text-sm font-semibold text-gray-300">
-                    Query
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Enter your query"
-                    value={selectedNode.config.query || ""}
-                    onChange={(e) =>
-                      handleConfigChange(
-                        selectedNode.id,
-                        "query",
-                        e.target.value,
-                      )
-                    }
-                    className="w-full px-3 py-2.5 bg-[#2A2A2D] border border-stroke rounded-lg text-white text-sm outline-none placeholder-gray-500 focus:border-primary/50 transition-colors"
-                  />
-                </div>
-              )}
-              {selectedNode.type === "file-upload" && (
-                <div className="mb-4">
-                  <label className="block mb-2 text-sm font-semibold text-gray-300">
-                    File URL or Local Path
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="https://example.com/file.pdf OR C:\Users\Sahil\resume.pdf"
-                    value={selectedNode.config.fileUrl || ""}
-                    onChange={(e) =>
-                      handleConfigChange(
-                        selectedNode.id,
-                        "fileUrl",
-                        e.target.value,
-                      )
-                    }
-                    className="w-full px-3 py-2.5 mb-4 bg-[#2A2A2D] border border-stroke rounded-lg text-white text-sm outline-none placeholder-gray-500 focus:border-primary/50 transition-colors"
-                  />
-                  
-                  <label className="block mb-2 text-sm font-semibold text-gray-300">
-                    Or Upload from Device
-                  </label>
-                  <input 
-                    type="file" 
-                    accept=".pdf"
-                    className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary/20 file:text-primary hover:file:bg-primary/30 cursor-pointer"
-                    onChange={async (e) => {
-                      if (!e.target.files[0]) return;
-                      const file = e.target.files[0];
-                      const formData = new FormData();
-                      formData.append("file", file);
-                      try {
-                        const token = localStorage.getItem("token");
-                        const res = await fetch(`${API_BASE}/workflows/upload`, {
-                          method: "POST",
-                          headers: { "Authorization": `Bearer ${token}` },
-                          body: formData
-                        });
-                        const data = await res.json();
-                        if (data.fileUrl) {
-                          handleConfigChange(selectedNode.id, "fileUrl", data.fileUrl);
-                        } else {
-                          alert("Upload failed: " + (data.error || "Unknown error"));
-                        }
-                      } catch (err) {
-                        console.error("Upload failed", err);
-                        alert("Upload failed. Is backend running?");
-                      }
-                    }}
-                  />
-                  
-                  {selectedNode.config.fileUrl && (
-                    <div className="mt-4 p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
-                      <p className="text-xs text-green-400 break-all font-medium">
-                        ✅ Selected: {selectedNode.config.fileUrl.split('\\').pop().split('/').pop()}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              )}
+            
+            <div className="flex-1 p-5 overflow-y-auto space-y-6">
               {selectedNode.type === "text-message" && (
-                <div className="mb-4">
-                  <label className="block mb-2 text-sm font-semibold text-gray-300">
-                    Custom Text
-                  </label>
-                  <textarea
-                    placeholder="Enter your text here..."
-                    value={selectedNode.config.text_input || ""}
-                    onChange={(e) =>
-                      handleConfigChange(
-                        selectedNode.id,
-                        "text_input",
-                        e.target.value,
-                      )
-                    }
-                    rows={8}
-                    className="w-full px-3 py-2.5 bg-[#2A2A2D] border border-stroke rounded-lg text-white text-sm outline-none placeholder-gray-500 focus:border-primary/50 transition-colors resize-vertical font-mono"
-                  />
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-gray-400">Custom Text</label>
+                  <textarea value={selectedNode.config?.text_input || ""} onChange={(e) => handleConfigChange(selectedNode.id, "text_input", e.target.value)} rows={6} className="w-full p-3 bg-[#2A2A2D] border border-stroke rounded-xl text-sm outline-none focus:border-primary/50 transition-colors resize-none" />
+                </div>
+              )}
+              {selectedNode.type === "openai" && (
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-gray-400">System Prompt</label>
+                  <textarea value={selectedNode.config?.prompt || ""} onChange={(e) => handleConfigChange(selectedNode.id, "prompt", e.target.value)} rows={8} className="w-full p-3 bg-[#2A2A2D] border border-stroke rounded-xl text-sm font-mono outline-none focus:border-primary/50 transition-colors resize-none" />
+                </div>
+              )}
+              {selectedNode.type === "scheduler" && (
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-gray-400">Minutes Before</label>
+                    <div className="flex items-center gap-3">
+                      <input type="number" min="0" max="60" value={selectedNode.config?.minutes_before || 5} onChange={(e) => handleConfigChange(selectedNode.id, "minutes_before", e.target.value)} className="flex-1 p-3 bg-[#2A2A2D] border border-stroke rounded-xl text-sm outline-none focus:border-primary/50" />
+                      <span className="text-xs text-gray-500">min</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+              {selectedNode.type === "crypto-tracker" && (
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-gray-400">Select Asset</label>
+                  <select value={selectedNode.config?.coin_id || "bitcoin"} onChange={(e) => handleConfigChange(selectedNode.id, "coin_id", e.target.value)} className="w-full p-3 bg-[#2A2A2D] border border-stroke rounded-xl text-sm outline-none focus:border-primary/50">
+                    <option value="bitcoin">Bitcoin (BTC)</option>
+                    <option value="ethereum">Ethereum (ETH)</option>
+                    <option value="solana">Solana (SOL)</option>
+                  </select>
+                </div>
+              )}
+              {selectedNode.type === "google-calendar" && (
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-gray-400">Calendar ID (Gmail)</label>
+                    <input type="text" placeholder="e.g. yourname@gmail.com" value={selectedNode.config?.calendar_id || "primary"} onChange={(e) => handleConfigChange(selectedNode.id, "calendar_id", e.target.value)} className="w-full p-3 bg-[#2A2A2D] border border-stroke rounded-xl text-sm outline-none focus:border-primary/50" />
+                    <p className="text-[10px] text-gray-500 italic">Note: Share your calendar with service account email first.</p>
+                  </div>
                 </div>
               )}
               {selectedNode.type === "telegram" && (
-                <div className="mb-4 space-y-4">
-                  {/* Chat ID */}
-                  <div>
-                    <label className="block mb-2 text-sm font-semibold text-gray-300">
-                      Telegram Chat ID
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="Enter Chat ID"
-                      value={selectedNode.config.chat_id || ""}
-                      onChange={(e) =>
-                        handleConfigChange(
-                          selectedNode.id,
-                          "chat_id",
-                          e.target.value,
-                        )
-                      }
-                      className="w-full px-3 py-2.5 bg-[#2A2A2D] border border-stroke rounded-lg text-white text-sm outline-none placeholder-gray-500 focus:border-primary/50 transition-colors"
-                    />
-                  </div>
-
-                  {/* Message */}
-                  <div>
-                    <label className="block mb-2 text-sm font-semibold text-gray-300">
-                      Telegram Message
-                    </label>
-                    <textarea
-                      placeholder="Enter message to send..."
-                      value={selectedNode.config.text_input || ""}
-                      onChange={(e) =>
-                        handleConfigChange(
-                          selectedNode.id,
-                          "text_input",
-                          e.target.value,
-                        )
-                      }
-                      rows={4}
-                      className="w-full px-3 py-2.5 bg-[#2A2A2D] border border-stroke rounded-lg text-white text-sm outline-none placeholder-gray-500 focus:border-primary/50 transition-colors resize-vertical"
-                    />
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-gray-400">Chat ID</label>
+                    <input type="text" value={selectedNode.config?.chat_id || ""} onChange={(e) => handleConfigChange(selectedNode.id, "chat_id", e.target.value)} className="w-full p-3 bg-[#2A2A2D] border border-stroke rounded-xl text-sm outline-none focus:border-primary/50" />
                   </div>
                 </div>
               )}
+            </div>
 
-              {selectedNode.type === "http-request" && (
-                <div className="mb-4 space-y-4">
-                  <div>
-                    <label className="block mb-2 text-sm font-semibold text-gray-300">URL *</label>
-                    <input
-                      type="url"
-                      placeholder="https://api.example.com/endpoint"
-                      value={selectedNode.config.url || ""}
-                      onChange={(e) => handleConfigChange(selectedNode.id, "url", e.target.value)}
-                      className="w-full px-3 py-2.5 bg-[#2A2A2D] border border-stroke rounded-lg text-white text-sm outline-none placeholder-gray-500 focus:border-primary/50 transition-colors"
-                    />
-                  </div>
-                  <div>
-                    <label className="block mb-2 text-sm font-semibold text-gray-300">Method</label>
-                    <select
-                      value={selectedNode.config.method || "GET"}
-                      onChange={(e) => handleConfigChange(selectedNode.id, "method", e.target.value)}
-                      className="w-full px-3 py-2.5 bg-[#2A2A2D] border border-stroke rounded-lg text-white text-sm outline-none focus:border-primary/50 transition-colors"
-                    >
-                      <option>GET</option>
-                      <option>POST</option>
-                      <option>PUT</option>
-                      <option>PATCH</option>
-                      <option>DELETE</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block mb-2 text-sm font-semibold text-gray-300">Headers (JSON)</label>
-                    <textarea
-                      placeholder={'{"Authorization": "Bearer token", "Content-Type": "application/json"}'}
-                      value={selectedNode.config.headers || ""}
-                      onChange={(e) => handleConfigChange(selectedNode.id, "headers", e.target.value)}
-                      rows={3}
-                      className="w-full px-3 py-2.5 bg-[#2A2A2D] border border-stroke rounded-lg text-white text-sm outline-none placeholder-gray-500 focus:border-primary/50 transition-colors resize-vertical font-mono"
-                    />
-                  </div>
-                  {["POST", "PUT", "PATCH"].includes(selectedNode.config.method) && (
-                    <div>
-                      <label className="block mb-2 text-sm font-semibold text-gray-300">Body (JSON or text)</label>
-                      <textarea
-                        placeholder='{"key": "value"}'
-                        value={selectedNode.config.body || ""}
-                        onChange={(e) => handleConfigChange(selectedNode.id, "body", e.target.value)}
-                        rows={4}
-                        className="w-full px-3 py-2.5 bg-[#2A2A2D] border border-stroke rounded-lg text-white text-sm outline-none placeholder-gray-500 focus:border-primary/50 transition-colors resize-vertical font-mono"
-                      />
-                    </div>
-                  )}
-                  <p className="text-xs text-gray-500">💡 Response from this node is passed to the next node as text.</p>
+            <div className="p-5 border-t border-stroke bg-brand-dark/30">
+              <button onClick={() => deleteNode(selectedNode.id)} className="flex items-center justify-center gap-2 w-full py-3 text-sm font-bold text-red-400 transition-all border border-red-500/30 rounded-xl hover:bg-red-500/10 active:scale-95"><Trash2 size={18} /> Delete Node</button>
+            </div>
+          </div>
+        )}
+
+        {/* Node Panel Overlay */}
+        {showNodePanel && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+            <div className="w-full max-w-2xl bg-[#1C1C1E] border border-stroke rounded-3xl shadow-2xl overflow-hidden flex flex-col h-[600px]">
+              <div className="flex items-center justify-between p-6 border-b border-stroke">
+                <div><h3 className="text-xl font-bold text-white">Add Node</h3><p className="text-sm text-gray-500">Select a component to add to your canvas</p></div>
+                <button onClick={() => setShowNodePanel(false)} className="p-2 text-gray-500 transition-colors hover:text-white rounded-lg hover:bg-white/5"><X size={24} /></button>
+              </div>
+              <div className="flex flex-1 overflow-hidden">
+                <div className="w-48 border-r border-stroke bg-brand-dark/20 p-2 space-y-1">
+                  {Object.keys(nodeCategories).map((cat) => (
+                    <button key={cat} onClick={() => setSelectedCategory(cat)} className={`w-full text-left px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${selectedCategory === cat ? "bg-primary text-brand-dark shadow-lg shadow-primary/20" : "text-gray-400 hover:bg-white/5 hover:text-white"}`}>{cat}</button>
+                  ))}
                 </div>
-              )}
-
-              {selectedNode.type === "condition" && (
-                <div className="mb-4 space-y-4">
-                  <div>
-                    <label className="block mb-2 text-sm font-semibold text-gray-300">Condition Type</label>
-                    <select
-                      value={selectedNode.config.condition_type || "contains"}
-                      onChange={(e) => handleConfigChange(selectedNode.id, "condition_type", e.target.value)}
-                      className="w-full px-3 py-2.5 bg-[#2A2A2D] border border-stroke rounded-lg text-white text-sm outline-none focus:border-primary/50 transition-colors"
-                    >
-                      <option value="contains">Contains</option>
-                      <option value="not_contains">Does NOT Contain</option>
-                      <option value="equals">Equals</option>
-                      <option value="starts_with">Starts With</option>
-                      <option value="ends_with">Ends With</option>
-                      <option value="length_gt">Length Greater Than</option>
-                      <option value="length_lt">Length Less Than</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block mb-2 text-sm font-semibold text-gray-300">Value</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. error, success, 100..."
-                      value={selectedNode.config.condition_value || ""}
-                      onChange={(e) => handleConfigChange(selectedNode.id, "condition_value", e.target.value)}
-                      className="w-full px-3 py-2.5 bg-[#2A2A2D] border border-stroke rounded-lg text-white text-sm outline-none placeholder-gray-500 focus:border-primary/50 transition-colors"
-                    />
-                  </div>
-                  <div className="p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg text-xs text-yellow-300">
-                    🔀 If condition is <strong>TRUE</strong> → passes data forward<br/>
-                    If condition is <strong>FALSE</strong> → workflow stops at this node
-                  </div>
+                <div className="flex-1 p-6 overflow-y-auto grid grid-cols-2 gap-4 content-start">
+                  {nodeCategories[selectedCategory].map((node) => (
+                    <button key={node.id} onClick={() => addNode(node)} className="group flex flex-col items-start p-4 text-left transition-all border bg-[#2A2A2D]/50 border-stroke rounded-2xl hover:border-primary hover:bg-primary/5 active:scale-95">
+                      <div className="p-3 mb-3 rounded-xl transition-colors group-hover:bg-primary/20" style={{ backgroundColor: `${node.color}15`, color: node.color }}><NodeIcon iconName={node.icon} size={24} /></div>
+                      <div className="font-bold text-white mb-1">{node.label}</div>
+                      <div className="text-xs text-gray-500 leading-relaxed">{node.description}</div>
+                    </button>
+                  ))}
                 </div>
-              )}
-
-              {selectedNode.type === "schedule" && (
-                <div className="mb-4 space-y-4">
-                  <div>
-                    <label className="block mb-2 text-sm font-semibold text-gray-300">Cron Expression</label>
-                    <input
-                      type="text"
-                      placeholder="0 8 * * * (every day at 8am)"
-                      value={selectedNode.config.cron || ""}
-                      onChange={(e) => handleConfigChange(selectedNode.id, "cron", e.target.value)}
-                      className="w-full px-3 py-2.5 bg-[#2A2A2D] border border-stroke rounded-lg text-white text-sm outline-none placeholder-gray-500 focus:border-primary/50 transition-colors font-mono"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    {[
-                      { label: "Every hour", value: "0 * * * *" },
-                      { label: "Every day 8am", value: "0 8 * * *" },
-                      { label: "Every Monday", value: "0 9 * * 1" },
-                      { label: "Every 30 min", value: "*/30 * * * *" },
-                    ].map((preset) => (
-                      <button
-                        key={preset.value}
-                        onClick={() => handleConfigChange(selectedNode.id, "cron", preset.value)}
-                        className="px-2 py-1.5 text-xs bg-[#2A2A2D] border border-stroke rounded-lg text-gray-300 hover:border-primary/50 hover:text-white transition-colors text-left"
-                      >
-                        {preset.label}<br/>
-                        <span className="font-mono text-gray-500">{preset.value}</span>
-                      </button>
-                    ))}
-                  </div>
-                  <p className="text-xs text-gray-500">⚠️ Requires Celery Beat to be running for scheduled execution.</p>
-                </div>
-              )}
-
-              {/* Delete Button */}
-              <div className="pt-6 mt-6 border-t border-stroke">
-                <button
-                  onClick={() => deleteNode(selectedNode.id)}
-                  className="flex items-center justify-center w-full gap-2 py-3 text-sm font-semibold text-red-400 transition-colors border rounded-lg cursor-pointer bg-red-500/20 border-red-500/30 hover:bg-red-500/30"
-                >
-                  <Trash2 size={16} /> Delete Node
-                </button>
               </div>
             </div>
           </div>
         )}
       </div>
-
-      {/* Bottom Toolbar */}
-      <div className="h-20 bg-[#1C1C1E] border-t border-stroke flex items-center justify-between px-6 shrink-0 gap-4">
-        {/* Left side buttons */}
-        <div className="flex items-center gap-3">
-          <button
-            onClick={clearCanvas}
-            className="px-4 py-3 bg-[#2A2A2D] text-gray-300 border border-stroke rounded-lg cursor-pointer font-semibold text-sm hover:border-red-500/50 hover:text-red-400 transition-colors flex items-center gap-2"
-          >
-            <Trash2 size={16} /> Clear
-          </button>
-
-          <button
-            onClick={exportWorkflow}
-            disabled={nodes.length === 0}
-            className={`flex items-center gap-2 px-4 py-3 rounded-lg cursor-pointer font-semibold text-sm border transition-all ${
-              nodes.length === 0
-                ? "bg-gray-600 border-gray-600 cursor-not-allowed opacity-60"
-                : "bg-primary text-brand-dark border-primary hover:bg-primary/90"
-            }`}
-          >
-            <Download size={16} /> Export
-          </button>
-        </div>
-
-        {/* Center — Workflow Name Input + Add Node Button */}
-        <div className="flex items-center gap-3 flex-1 justify-center max-w-sm">
-          <button
-            onClick={() => setShowNodePanel(!showNodePanel)}
-            className={`w-10 h-10 shrink-0 rounded-full border-none cursor-pointer flex items-center justify-center shadow-xl transition-all duration-300 ${
-              showNodePanel
-                ? "bg-red-500 hover:bg-red-600"
-                : "bg-primary hover:bg-primary/90"
-            }`}
-          >
-            {showNodePanel ? (
-              <X size={20} className="text-white" strokeWidth={2.5} />
-            ) : (
-              <Plus size={20} className="text-brand-dark" strokeWidth={2.5} />
-            )}
-          </button>
-
-          {/* Editable Workflow Name */}
-          <input
-            type="text"
-            value={workflowName}
-            onChange={(e) => setWorkflowName(e.target.value)}
-            placeholder="Workflow name..."
-            className="flex-1 bg-[#2A2A2D] text-white text-sm font-semibold border border-stroke rounded-lg px-4 py-3 text-center focus:outline-none focus:border-primary/70 focus:bg-[#333336] transition-colors placeholder-gray-500"
-          />
-        </div>
-
-        {/* Right side buttons */}
-        <div className="flex items-center gap-3">
-          <button
-            onClick={saveWorkflow}
-            disabled={nodes.length === 0}
-            className={`flex items-center gap-2 px-4 py-3 rounded-lg cursor-pointer font-semibold text-sm border transition-all ${
-              nodes.length === 0
-                ? "bg-gray-600 border-gray-600 cursor-not-allowed opacity-60"
-                : "bg-primary text-brand-dark border-primary hover:bg-primary/90"
-            }`}
-          >
-            <Save size={16} /> Save
-          </button>
-          <button
-            onClick={executeWorkflow}
-            disabled={isExecuting || nodes.length < 2}
-            className={`flex items-center gap-2 px-5 py-3 rounded-lg cursor-pointer font-semibold text-sm border transition-all ${
-              isExecuting || nodes.length < 2
-                ? "bg-gray-600 border-gray-600 cursor-not-allowed opacity-60"
-                : "bg-primary text-brand-dark border-primary hover:bg-primary/90"
-            }`}
-          >
-            {isExecuting ? (
-              <RefreshCw size={16} className="spinning" />
-            ) : (
-              <Play size={16} />
-            )}
-            {isExecuting ? "Executing..." : "Run"}
-          </button>
-        </div>
-      </div>
-
-      {/* Node Panel Modal */}
-      {showNodePanel && (
-        <div
-          className="fixed inset-0 z-40 flex items-center justify-center bg-black/50"
-          onClick={() => setShowNodePanel(false)}
-        >
-          <div
-            className="bg-[#1C1C1E] border border-stroke rounded-2xl w-[900px] max-h-[80vh] overflow-hidden"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Category Tabs */}
-            <div className="flex gap-1 px-4 pt-3 overflow-x-auto border-b border-stroke">
-              {Object.keys(nodeCategories).map((category) => (
-                <button
-                  key={category}
-                  onClick={() => setSelectedCategory(category)}
-                  className={`px-5 py-3 border-b-2 border-transparent text-sm font-semibold whitespace-nowrap transition-all ${
-                    selectedCategory === category
-                      ? "text-primary border-primary bg-primary/10"
-                      : "text-gray-400 hover:text-gray-300"
-                  }`}
-                >
-                  {category}
-                </button>
-              ))}
-            </div>
-
-            {/* Node Grid */}
-            <div className="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 max-h-[calc(80vh-60px)] overflow-y-auto">
-              {nodeCategories[selectedCategory]?.map((node) => (
-                <button
-                  key={node.id}
-                  onClick={() => addNode(node)}
-                  className="bg-[#2A2A2D] border border-stroke rounded-xl p-4 cursor-pointer text-left flex items-start gap-3 transition-all hover:border-primary/50"
-                >
-                  <div
-                    className="flex items-center justify-center h-12 text-2xl min-w-12 rounded-xl"
-                    style={{ backgroundColor: `${node.color}15` }}
-                  >
-                    {node.icon}
-                  </div>
-                  <div>
-                    <div className="mb-1 text-sm font-semibold text-white">
-                      {node.label}
-                    </div>
-                    <div className="text-xs leading-relaxed text-gray-400">
-                      {node.description}
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Workflow List Modal */}
-      {showWorkflowList && (
-        <div
-          className="fixed inset-0 z-40 flex items-center justify-center bg-black/50"
-          onClick={() => setShowWorkflowList(false)}
-        >
-          <div
-            className="bg-[#1C1C1E] border border-stroke rounded-2xl w-[600px] max-h-[80vh] overflow-hidden"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between p-6 border-b border-stroke">
-              <h2 className="text-xl font-bold text-white">Saved Workflows</h2>
-              <button
-                onClick={() => setShowWorkflowList(false)}
-                className="bg-[#2A2A2D] border border-stroke rounded-lg p-2 cursor-pointer hover:border-primary/50 transition-colors"
-              >
-                <X size={18} className="text-gray-400" />
-              </button>
-            </div>
-            <div className="p-4 max-h-[calc(80vh-80px)] overflow-y-auto">
-              {savedWorkflows.length === 0 ? (
-                <div className="py-10 text-center text-gray-500">
-                  No saved workflows yet
-                </div>
-              ) : (
-                savedWorkflows.map((workflow) => (
-                  <div
-                    key={workflow.id}
-                    onClick={() => loadWorkflow(workflow.id)}
-                    className="p-4 mb-3 bg-[#2A2A2D] border border-stroke rounded-xl cursor-pointer transition-all hover:border-primary/50"
-                  >
-                    <div className="mb-1 font-semibold text-white">
-                      {workflow.name}
-                    </div>
-                    <div className="text-sm text-gray-400">
-                      {(workflow.nodes || []).length} nodes •{" "}
-                      {(workflow.connections || []).length} connections
-                    </div>
-                    <div className="mt-1 text-xs text-gray-500">
-                      Last updated:{" "}
-                      {new Date(workflow.updatedAt).toLocaleString()}
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      <style>{`
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        .spinning {
-          animation: spin 1s linear infinite;
-        }
-      `}</style>
     </div>
   );
 }
